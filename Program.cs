@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 /*1) Не очищается буфер! TmpKey использует неактуальные данные */
 /*2) Перед посадкой идет пауза*/
 /**/
-namespace Game2048
+namespace tetris2048
 {
     class Program
     {

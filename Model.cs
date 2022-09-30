@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
-namespace Game2048
+namespace tetris2048
 {
     class Model
     {

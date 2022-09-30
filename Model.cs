@@ -1,18 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
-namespace tetris2048
+namespace Game2048
 {
     class Model
     {
-        Map map; // игровое поле
+        public Map map; // игровое поле
 
         static Random random = new Random();
         bool isGameOver = false; // пересечение границы
-
+        public int num;
         public int width
         {
             get { return map.width; }
@@ -34,9 +35,17 @@ namespace tetris2048
         {
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < length; y++)
+                { 
                     map.Set(x, y, 0);
+                }
 
             AddRandomNumber();
+        }
+        public void NewStart(Current current)
+        { 
+            AddRandomNumber();
+            current.X = 2;
+            current.Y = 0;
         }
 
         void Lift(Current current, int sx, int sy) // движение кубика
@@ -67,20 +76,21 @@ namespace tetris2048
 
         public void FallCube(Current current) // падение кубика, независимое от пользователя
         {
-
+            Down(current);
+            //Thread.Sleep(500);
         }
 
         public int GetMap(int x, int y)
         {
             return map.Get(x, y);
         }
-
+        
         void AddRandomNumber() // рандомное выпадение кубика (пока неверно работает)
         {
             if (isGameOver)
                 return;
-
-            map.Set(2, 0, random.Next(1, MaxNumber + 1) * 2); // работает для поля 5, 7
+            num = random.Next(1, MaxNumber + 1) * 2;
+            map.Set(2, 0, num); // работает для поля 5, 7
         }
 
         void Join() // объединение кубиков
@@ -92,6 +102,5 @@ namespace tetris2048
         {
             return isGameOver;
         }
-
     }
 }

@@ -9,88 +9,89 @@ namespace tetris2048
 {
     class Model
     {
-        public Map map; // игровое поле
+        public Map map { get; } // игровое поле
 
-        static Random random = new Random();
-        bool isGameOver = false; // пересечение границы
-        public int num;
-        public int width
-        {
-            get { return map.width; }
-        } // ширина поля
-        public int length
-        {
-            get { return map.length; }
-        } // длина поля
+        private bool IsGameOver; // продолжение игры
 
-        private int MaxNumber = 2; // максимальное число
-        //private uint Points; // очки
+        private int MaxNum; // максимальное число
 
-        public Model(int width, int length) // конструктор (старт игры)
+        private Current current; // текущий кубик
+
+        public Model() // конструктор
         {
-            map = new Map(width, length);
+            map = new Map();
+            IsGameOver = false;
+            MaxNum = 2;
         }
 
         public void Start()
         {
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < length; y++)
-                { 
+            for (int x = 0; x < map.GetWidth(); x++)
+                for (int y = 0; y < map.GetLength(); y++)
                     map.Set(x, y, 0);
-                }
 
-            AddRandomNumber();
-        }
-        public void NewStart(Current current)
-        { 
-            AddRandomNumber();
-            current.X = 2;
-            current.Y = 0;
+            AddCurrent();
         }
 
-        void Lift(Current current, int sx, int sy) // движение кубика
+        public void NewStart()
         {
-            if (map.Get(current.X + sx, current.Y + sy) == 0)
+            for (int i = 0; i < map.GetWidth(); i++)
             {
-                map.Set(current.X + sx, current.Y + sy, map.Get(current.X, current.Y));
-                map.Set(current.X, current.Y, 0);
-                current.X += sx;
-                current.Y += sy;
+                if (map.Get(i, 1) != 0)
+                    IsGameOver = true;
+            }
+
+            AddCurrent();
+        }
+
+        void Lift(int sx, int sy) // движение кубика
+        {
+            if (map.Get(current.x + sx, current.y + sy) == 0)
+            {
+                map.Set(current.x + sx, current.y + sy, map.Get(current.x, current.y));
+                map.Set(current.x, current.y, 0);
+                current.x += sx;
+                current.y += sy;
             }
         }
 
-        public void Left(Current current)
+        void Lift(int sx, int sy, ref bool EndCurrent) // перегрузка Lift(), вызывается только в Down()
         {
-            Lift(current, -1, 0);
+            if (map.Get(current.x + sx, current.y + sy) == 0)
+            {
+                map.Set(current.x + sx, current.y + sy, map.Get(current.x, current.y));
+                map.Set(current.x, current.y, 0);
+                current.x += sx;
+                current.y += sy;
+            }
+            else
+                EndCurrent = true;
         }
 
-        public void Right(Current current)
+        public void Left()
         {
-            Lift(current, +1, 0);
+            Lift(-1, 0);
         }
 
-        public void Down(Current current) // нужно зациклить, чтобы падал не прерываясь
+        public void Right()
         {
-            Lift(current, 0, +1);
+            Lift(+1, 0);
         }
 
-        public void FallCube(Current current) // падение кубика, независимое от пользователя
+        public bool Down()
         {
-            Down(current);
-            //Thread.Sleep(500);
+            bool EndCurrent = false;
+            Lift(0, +1, ref EndCurrent);
+            return EndCurrent;
         }
 
-        public int GetMap(int x, int y)
+        void AddCurrent() // рандомное выпадение кубика
         {
-            return map.Get(x, y);
-        }
-        
-        void AddRandomNumber() // рандомное выпадение кубика (пока неверно работает)
-        {
-            if (isGameOver)
+            if (IsGameOver)
                 return;
-            num = random.Next(1, MaxNumber + 1) * 2;
-            map.Set(2, 0, num); // работает для поля 5, 7
+
+            current = new Current(MaxNum);
+            map.Set(current.x, current.y, current.value);
         }
 
         void Join() // объединение кубиков
@@ -100,7 +101,7 @@ namespace tetris2048
 
         public bool GameOver() // конец игры
         {
-            return isGameOver;
+            return IsGameOver;
         }
     }
 }

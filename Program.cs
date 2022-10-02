@@ -25,7 +25,7 @@ namespace tetris2048
 
             while (!model.GameOver())
             {
-                Console.Clear();
+                //Console.Clear();
 
                 Show(model);
 
@@ -51,7 +51,7 @@ namespace tetris2048
                             while (!EndCurrent)
                             {
                                 EndCurrent = model.Down();
-                                Console.Clear();
+                                //Console.Clear();
                                 Show(model);
                                 Thread.Sleep(100);
                             }
@@ -66,6 +66,23 @@ namespace tetris2048
 
                 if (EndCurrent)
                 {
+                    while (true)
+                    {
+                        bool JoinIs = model.Join();
+
+                        if (!JoinIs) break;
+
+                        Show(model);                 // показываем как объединили
+
+                        Thread.Sleep(300);
+
+                        model.DownforJoin();
+
+                        Show(model);                 // показываем как опустили все элементы
+
+                        Thread.Sleep(300);
+                    }
+
                     model.NewStart();
                 }
             }

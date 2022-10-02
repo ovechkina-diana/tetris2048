@@ -14,11 +14,12 @@ namespace tetris2048
         public int y { set; get; }
         public int value { set; get; }
 
-        public Current(int MaxNum)
+        public Current(int MaxDegree, int x = 2, int y = 0)
         {
-            x = 2;
-            y = 0;
-            value = random.Next(2, MaxNum);
+            this.x = x;
+            this.y = y;
+            int Degree = random.Next(1, MaxDegree); // выбираем рандомную степень
+            value = (int)Math.Pow(2, Degree);
         }
     }
 }

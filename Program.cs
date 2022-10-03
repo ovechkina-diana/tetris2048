@@ -12,107 +12,69 @@ namespace tetris2048
     {
         static void Main(string[] args)
         {
-            Program program = new Program();
-            program.Start();
-        }
-        void Start()
-        {
-            Model model = new Model();
+            Game.Start();                                              // начинаем игру
 
-            model.Start();
-
-            while (!model.GameOver())
+            while (!Game.Over)                                         // пока не проиграли
             {
-                //Console.Clear();
+                Current current = Game.AddCurrent();                   // добавляем новый кубик
 
-                Show(model);
-
-                Thread.Sleep(700);
-
-                bool EndCurrent = false; // если EndCurrent == true значит текущий кубик упал
-
-                if (Console.KeyAvailable)
+                while (!current.IsFell)                                // пока кубик не упал
                 {
-                    ConsoleKey Key = Console.ReadKey(true).Key;
+                    Game.Show();
+                    Thread.Sleep(700);
 
-                    switch (Key)
+                    if (Console.KeyAvailable)
                     {
-                        case ConsoleKey.LeftArrow:
-                            model.Left();
-                            break;
+                        ConsoleKey Key = Console.ReadKey(true).Key;
 
-                        case ConsoleKey.RightArrow:
-                            model.Right();
-                            break;
+                        switch (Key)
+                        {
+                            case ConsoleKey.LeftArrow:
+                                Move.Left(ref current);
+                                break;
 
-                        case ConsoleKey.DownArrow:
-                            while (!EndCurrent)
-                            {
-                                EndCurrent = model.Down();
-                                //Console.Clear();
-                                Show(model);
-                                Thread.Sleep(100);
-                            }
-                            break;
+                            case ConsoleKey.RightArrow:
+                                Move.Right(ref current);
+                                break;
 
-                        case ConsoleKey.Backspace:
-                            return;
-                    }
-                }
+                            case ConsoleKey.DownArrow:
+                                while (!current.IsFell)
+                                {
+                                    Move.Down(ref current);
 
-                EndCurrent = model.Down();
+                                    Game.Show();
+                                    Thread.Sleep(100);
+                                }
+                                break;
 
-                if (EndCurrent)
-                {
-                    while (true)
-                    {
-                        bool JoinIs = model.Join();
-
-                        if (!JoinIs) break;
-
-                        Show(model);                 // показываем как объединили
-
-                        Thread.Sleep(300);
-
-                        model.DownforJoin();
-
-                        Show(model);                 // показываем как опустили все элементы
-
-                        Thread.Sleep(300);
+                            case ConsoleKey.Spacebar:
+                                return;
+                        }
                     }
 
-                    model.NewStart();
+                    Move.Down(ref current);
                 }
+
+                while (true)
+                {
+                    bool JoinIs = Join.MergeCubes();
+
+                    if (!JoinIs) break;
+
+                    Game.Show();                 // показываем как объединили
+                    Thread.Sleep(300);
+
+                    Join.Down();
+
+                    Game.Show();                 // показываем как опустили все элементы
+                    Thread.Sleep(300);
+                }
+
+                Game.IsGameOver();
             }
 
             Console.Clear();
-            Show(model);
-        }
-        static void Show(Model model)
-        {
-            for (int y = 0; y < model.map.GetLength(); y++)
-            {
-                for (int x = 0; x < model.map.GetWidth(); x++)
-                {
-                    Console.SetCursorPosition(x * 5 + 5, y * 2 + 2);
-                    ConsoleColor color;
-                    int number = model.map.Get(x, y);
-                    if (number != 0)
-                    {
-                        color = GetColor(number);
-                        Out(color, number);
-                    }
-                    else
-                        Console.Write(" . ");
-                }
-                if (y == 1)
-                    Console.Write("-------");
-            }
-            Console.WriteLine();
-            if (model.GameOver())
-                Console.WriteLine("Game Over");
-            else
-                Console.WriteLine("Still play");
+            Game.Show();
         }
         static ConsoleColor GetColor(int x)
         {

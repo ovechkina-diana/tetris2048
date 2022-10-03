@@ -21,6 +21,7 @@ namespace tetris2048
             };
             Console.Clear();
             var result = ReaderFromFileAsync(newplayer);
+
             program.Start(newplayer, result.Result);
         }
 
@@ -138,7 +139,11 @@ namespace tetris2048
             }
             Console.WriteLine();
             if (model.GameOver())
+            {
                 Console.WriteLine("Game Over");
+                player.Points = model.points;
+                FileOfPoints(player, ListPlayers);
+            }
             else
                 Console.WriteLine("Still play");
         }

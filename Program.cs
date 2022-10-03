@@ -11,23 +11,130 @@ namespace tetris2048
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            Program program = new Program();
+            //Program program = new Program();
+
             Console.WriteLine("Создайте свой ник ");
             Player newplayer = new Player
             {
                 Nik = Console.ReadLine(),
             };
             Console.Clear();
-            var result = ReaderFromFileAsync(newplayer);
 
-            program.Start(newplayer, result.Result);
+            var result = ReaderFromFileAsync(newplayer);
+            Start(newplayer, result.Result);
+            SizingUp(newplayer);
         }
 
-        void Start()
+        static async Task<List<Player>> ReaderFromFileAsync(Player pl)
+        {
+            var result = await Task.Run(() => ReaderFromFile(pl));
+            return result;
+        }
+        static List<Player> ReaderFromFile(Player pl)
+        {
+            List<Player> ListPlayers = new List<Player>();
+            using (var sr = new StreamReader(@"C:\Users\myasn\Downloads\tetris.txt"))
+            {
+                string s;
+                while ((s = sr.ReadLine()) != null)
+                {
+                    var line = s.Split('.', '-');
+                    int.TryParse(line[0], out int R);
+                    int.TryParse(line[2], out int P);
+                    ListPlayers.Add(new Player { Rating = R, Nik = line[1], Points = P });
+                    //ListPlayer.Add((R, line[1], P));
+                }
+            }
+            using (var sw = new StreamWriter(@"C:\Users\myasn\Downloads\tetris.txt", false))//check async
+            {
+                sw.WriteLine(pl.Nik);
+
+            }
+            return ListPlayers;
+        }
+        static int FileOfPoints(Player pl, List<Player> ListPlayers)
+        {
+            #region ReaderFile
+            ////string path = "tetris.txt";// int count = 0;
+            ////var ListPlayer = new List<(int Rating, string Nik, int Points)>();  //ValueTuple
+            //List<Player> ListPlayers = new List<Player>();
+            //using (var sr = new StreamReader(@"C:\Users\myasn\Downloads\tetris.txt"))
+            //{
+            //    string s;
+            //    while ((s = sr.ReadLine()) != null)
+            //    {
+            //        var line = s.Split('.', '-');
+            //        int.TryParse(line[0], out int R);
+            //        int.TryParse(line[2], out int P);
+            //        ListPlayers.Add(new Player { Rating = R, Nik = line[1], Points = P });
+            //        //ListPlayer.Add((R, line[1], P));
+            //    }
+            //}
+            #endregion
+            ListPlayers.Add(new Player { Rating = pl.Rating, Nik = pl.Nik, Points = pl.Points });
+            // ListPlayer.Add((pl.Rating, pl.Nik, pl.Points));
+
+            var ListSortPlayers = (from p in ListPlayers
+                                   orderby p.Points descending
+                                   select p).ToList();
+            #region VT
+            // ListSortPlayers.ForEach(delegate ((int R, string N, int P)players)
+            //{
+            //    int position = 1;
+            //    players.R = position;
+            //    position++;
+            //});
+            //var count = ListSortPlayers.Aggregate(0, (index, item) =>
+            //{
+            //    item.Rating = index+1;
+
+            //    return (item.Rating) ;
+            //});
+            #endregion
+            int position = 1;
+            for (var i = 0; i < ListSortPlayers.Count; i++)
+            {
+                //var pos = ListSortPlayers[i].Rating;
+                //pos = position;
+                ListSortPlayers[i].Rating = position;
+                //(int Rating, string Nik, int Points) t = ListSortPlayers[i];
+                //t.Rating = position;
+                position++;
+            }
+
+            using (var sw = new StreamWriter(@"C:\Users\myasn\Downloads\tetris.txt", false))
+            {
+
+                foreach (var item in ListSortPlayers)
+                {
+                    sw.WriteLine($"{item.Rating}. {item.Nik} - {item.Points}");
+
+                }
+                //sw.WriteLine(ListSortPlayers.Find(x=>x.Nik==pl.Nik).Rating);
+
+            }
+            return ListSortPlayers.Find(x => x.Nik == pl.Nik).Rating;
+        }
+
+        static void SizingUp(Player newplayer)
+        {
+            Console.Clear();
+            string GameOver = "\n\t\tGame Over";
+            Console.WriteLine(GameOver);
+            //Console.ForegroundColor = ConsoleColor.Red;
+            ////Console.ResetColor();
+            Console.WriteLine("\n\t Вы набрали {0} очков", newplayer.Points);
+            Console.WriteLine("\n\t Ваше место в рейтинге -  {0} ", newplayer.Rating);
+        }
+
+        static void Start(Player player, List<Player> players)
         {
             Model model = new Model();
+
+            //var result= ReaderFromFileAsync(player);
 
             model.Start();
 
@@ -35,7 +142,7 @@ namespace tetris2048
             {
                 //Console.Clear();
 
-                Show(model);
+                Show(model, player, players);
 
                 Thread.Sleep(700);
 
@@ -44,7 +151,6 @@ namespace tetris2048
                 if (Console.KeyAvailable)
                 {
                     ConsoleKey Key = Console.ReadKey(true).Key;
-
                     switch (Key)
                     {
                         case ConsoleKey.LeftArrow:
@@ -60,79 +166,62 @@ namespace tetris2048
                             {
                                 EndCurrent = model.Down();
                                 //Console.Clear();
-                                Show(model);
+                                Show(model, player, players);
                                 Thread.Sleep(100);
                             }
                             break;
 
-                        case ConsoleKey.Backspace:
+                        case ConsoleKey.Escape:
                             return;
                     }
                 }
-
                 EndCurrent = model.Down();
-
                 if (EndCurrent)
                 {
                     while (true)
                     {
                         bool JoinIs = model.Join();
-
                         if (!JoinIs) break;
-
-                        Show(model);                 // показываем как объединили
-
-                        Thread.Sleep(300);
-
-                        model.DownforJoin();
-
-                        Show(model);                 // показываем как опустили все элементы
-
-                        Thread.Sleep(300);
+                        Show(model, player, players);                 // показываем как объединили
+                        Thread.Sleep(100);
+                        model.method();
+                        Show(model, player, players);                 // показываем как опустили все элементы
+                        Thread.Sleep(100);
                     }
-
                     model.NewStart();
                 }
             }
-
             Console.Clear();
-            Show(model);
-        }
-	public enum Colors
-        {
-            Blue = 2,
-            Red = 4,
-            Yellow = 8,
-            Magenta = 16,
-            Green = 32,
-            Cyan = 64,
-            Black = 128,
-            DarkBlue = 256,
-            DarkRed = 512,
-            DarkYellow = 1024,
-            DarkMagenta = 2048,
-            DarkGreen = 4096,
-            DarkCyan = 8192,
-            //Grey = 16384,
-            //DarkGrey = 32768
+            Show(model, player, players);
         }
 
-        static void Show(Model model)
+
+        static void Show(Model model, Player player, List<Player> ListPlayers)
         {
+
+            var rnd = new Random();
             for (int y = 0; y < model.map.GetLength(); y++)
             {
                 for (int x = 0; x < model.map.GetWidth(); x++)
                 {
                     Console.SetCursorPosition(x * 5 + 5, y * 2 + 2);
-                    ConsoleColor color;
+
                     int number = model.map.Get(x, y);
-                    if (number != 0)
+                    if (number == 0)
                     {
-                        color = GetColor(number);
-                        Out(color, number);
+                        Console.Write(".");
+                        //Console.ForegroundColor = (ConsoleColor)15;
                     }
                     else
-                        Console.Write(" . ");
+                    {
+                        //Console.ForegroundColor = (ConsoleColor)rnd.Next(1, 14);
+                        Console.Write(number.ToString());
+
+                        // Console.ForegroundColor = (ConsoleColor)(15);
+                    }
+                    //Console.Write(number == 0 ? "." : number.ToString() + "  ");
+
+
                 }
                 if (y == 1)
                     Console.Write("-------");
@@ -140,24 +229,17 @@ namespace tetris2048
             Console.WriteLine();
             if (model.GameOver())
             {
-                Console.WriteLine("Game Over");
+                Console.WriteLine("GameOver");
                 player.Points = model.points;
-                FileOfPoints(player, ListPlayers);
+                var result = FileOfPoints(player, ListPlayers);
+                player.Rating = result;
+                SizingUp(player);
             }
+
             else
                 Console.WriteLine("Still play");
         }
-        static ConsoleColor GetColor(int x)
-        {
-            var t = Enum.GetName(typeof(Colors), x);
-            int temp = (int)Enum.Parse(typeof(ConsoleColor), t);
-            return (ConsoleColor)temp;
-        }
-        private static void Out(ConsoleColor color, int x)
-        {
-            Console.ForegroundColor = color;
-            Console.Write(x.ToString() + "  ");
-            Console.ResetColor();
-        }
+
+
     }
 }

@@ -90,7 +90,7 @@ namespace tetris2048
             if (IsGameOver)
                 return;
 
-            current = new Current(MaxNum);
+            current = new Current(MaxDegree);
             map.Set(current.x, current.y, current.value);
         }
 

@@ -40,9 +40,17 @@ namespace tetris2048
                 {
                     Console.SetCursorPosition(x * 5 + 5, y * 2 + 2);
 
+                    ConsoleColor color;
+
                     int number = map[x, y];
 
-                    Console.Write(number == 0 ? " . " : number.ToString() + "  ");
+                    if (number != 0)
+                    {
+                        color = Color.GetColor(number);
+                        Color.Out(color, number);
+                    }
+                    else
+                        Console.Write(" . ");
                 }
                 if (y == 1)
                     Console.Write("-------");

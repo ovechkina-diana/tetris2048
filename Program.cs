@@ -14,7 +14,14 @@ namespace tetris2048
         static void Main(string[] args)
         {
             Program program = new Program();
-            program.Start();
+            Console.WriteLine("Создайте свой ник ");
+            Player newplayer = new Player
+            {
+                Nik = Console.ReadLine(),
+            };
+            Console.Clear();
+            var result = ReaderFromFileAsync(newplayer);
+            program.Start(newplayer, result.Result);
         }
 
         void Start()

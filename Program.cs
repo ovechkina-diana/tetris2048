@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,13 +12,13 @@ namespace tetris2048
     {
         static void Main(string[] args)
         {
-            Game.Start();                                              // начинаем игру
+            Game.Start();                                              // РЅР°С‡РёРЅР°РµРј РёРіСЂСѓ
 
-            while (!Game.Over)                                         // пока не проиграли
+            while (!Game.Over)                                         // РїРѕРєР° РЅРµ РїСЂРѕРёРіСЂР°Р»Рё
             {
-                Current current = Game.AddCurrent();                   // добавляем новый кубик
+                Current current = Game.AddCurrent();                   // РґРѕР±Р°РІР»СЏРµРј РЅРѕРІС‹Р№ РєСѓР±РёРє
 
-                while (!current.IsFell)                                // пока кубик не упал
+                while (!current.IsFell)                                // РїРѕРєР° РєСѓР±РёРє РЅРµ СѓРїР°Р»
                 {
                     Game.Show();
                     Thread.Sleep(700);
@@ -60,12 +61,12 @@ namespace tetris2048
 
                     if (!JoinIs) break;
 
-                    Game.Show();                 // показываем как объединили
+                    Game.Show();                 // РїРѕРєР°Р·С‹РІР°РµРј РєР°Рє РѕР±СЉРµРґРёРЅРёР»Рё
                     Thread.Sleep(300);
 
                     Join.Down();
 
-                    Game.Show();                 // показываем как опустили все элементы
+                    Game.Show();                 // РїРѕРєР°Р·С‹РІР°РµРј РєР°Рє РѕРїСѓСЃС‚РёР»Рё РІСЃРµ СЌР»РµРјРµРЅС‚С‹
                     Thread.Sleep(300);
                 }
 
@@ -75,7 +76,7 @@ namespace tetris2048
             Console.Clear();
             Game.Show();
         }
-	 static ConsoleColor GetColor(int x)
+        static ConsoleColor GetColor(int x)
         {
             var t = Enum.GetName(typeof(Colors), x);
             int temp = (int)Enum.Parse(typeof(ConsoleColor), t);

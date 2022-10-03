@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +8,18 @@ namespace tetris2048
 {
     class Current
     {
-        public int X { set; get; }
-        public int Y { set; get; }
+        static Random random = new Random();
 
-        public Current() { X = 2; Y = 0; }
+        public int x { set; get; }
+        public int y { set; get; }
+        public int value { set; get; }
+
+        public Current(int MaxDegree, int x = 2, int y = 0)
+        {
+            this.x = x;
+            this.y = y;
+            int Degree = random.Next(1, MaxDegree); // выбираем рандомную степень
+            value = (int)Math.Pow(2, Degree);
+        }
     }
 }

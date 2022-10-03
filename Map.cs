@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +8,16 @@ namespace tetris2048
 {
     class Map
     {
-        public int width { get; private set; }
-        public int length { get; private set; }
-        int[,] map;
+        private const int width = 5;
+        public int GetWidth() { return width; }
 
-        public Map(int width, int length)
+        private const int length = 8;
+        public int GetLength() { return length; }
+
+        private int[,] map;
+
+        public Map()
         {
-            this.width = width;
-            this.length = length;
             map = new int[width, length];
         }
 

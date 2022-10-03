@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+
+
 
 namespace tetris2048
 {
@@ -16,19 +19,76 @@ namespace tetris2048
 
         void Start()
         {
-            Model model = new Model(5, 8);
+            Model model = new Model();
+
             model.Start();
-            Current current = new Current();
-            while (true)
+
+            while (!model.GameOver())
             {
+                //Console.Clear();
+
                 Show(model);
-                switch (Console.ReadKey(false).Key)
+
+                Thread.Sleep(700);
+
+                bool EndCurrent = false; // если EndCurrent == true значит текущий кубик упал
+
+                if (Console.KeyAvailable)
                 {
-                    case ConsoleKey.LeftArrow: model.Left(current); break;
-                    case ConsoleKey.RightArrow: model.Right(current); break;
-                    case ConsoleKey.DownArrow: model.Down(current); break;
+                    ConsoleKey Key = Console.ReadKey(true).Key;
+
+                    switch (Key)
+                    {
+                        case ConsoleKey.LeftArrow:
+                            model.Left();
+                            break;
+
+                        case ConsoleKey.RightArrow:
+                            model.Right();
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            while (!EndCurrent)
+                            {
+                                EndCurrent = model.Down();
+                                //Console.Clear();
+                                Show(model);
+                                Thread.Sleep(100);
+                            }
+                            break;
+
+                        case ConsoleKey.Backspace:
+                            return;
+                    }
+                }
+
+                EndCurrent = model.Down();
+
+                if (EndCurrent)
+                {
+                    while (true)
+                    {
+                        bool JoinIs = model.Join();
+
+                        if (!JoinIs) break;
+
+                        Show(model);                 // показываем как объединили
+
+                        Thread.Sleep(300);
+
+                        model.DownforJoin();
+
+                        Show(model);                 // показываем как опустили все элементы
+
+                        Thread.Sleep(300);
+                    }
+
+                    model.NewStart();
                 }
             }
+
+            Console.Clear();
+            Show(model);
         }
 	public enum Colors
         {
@@ -49,7 +109,7 @@ namespace tetris2048
             //DarkGrey = 32768
         }
 
-      	static void Show(Model model)
+        static void Show(Model model)
         {
             for (int y = 0; y < model.map.GetLength(); y++)
             {
@@ -75,7 +135,7 @@ namespace tetris2048
             else
                 Console.WriteLine("Still play");
         }
-	 static ConsoleColor GetColor(int x)
+        static ConsoleColor GetColor(int x)
         {
             var t = Enum.GetName(typeof(Colors), x);
             int temp = (int)Enum.Parse(typeof(ConsoleColor), t);

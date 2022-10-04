@@ -16,6 +16,7 @@ namespace tetris2048
         private int MaxDegree; // максимальная степень
 
         private Current current; // текущий кубик
+        public int points;
 
         public Model() // конструктор
         {
@@ -102,6 +103,8 @@ namespace tetris2048
             LiftforJoin(+1, 0, value, ref JoinIs);
             LiftforJoin(0, +1, value, ref JoinIs);
 
+            if (JoinIs)
+                points += current.value;
             return JoinIs;
         }
 

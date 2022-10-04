@@ -21,6 +21,7 @@ namespace tetris2048
             //    Nik = Console.ReadLine(),
             //};
 
+            var result = ReaderFromFileAsync();
             Console.WriteLine("Вы зарегистрированы? Введите Да - 1/Нет - 2"); var answer = Convert.ToInt32(Console.ReadLine());
             if (answer == 1)
             {
@@ -30,21 +31,30 @@ namespace tetris2048
             else if (answer == 2) player = user.LogIn();
             else Console.WriteLine("Err");//todo
             Console.Clear();
-
-            var result = ReaderFromFileAsync(player);
             Start(player);
+                    
             FileOfPoints(player, result.Result);
-            //SizingUp(player);
+          
         }
-
-        static async Task<List<(int Rating, string Nik, int Points)>> ReaderFromFileAsync(Player pl)
+        static bool CheckTask(Task t)
         {
-            var result = await Task.Run(() => ReaderFromFile(pl));
+            if (t.Status == TaskStatus.RanToCompletion) return true;
+            return false;
+        }
+        static async Task<List<(int Rating, string Nik, int Points)>> ReaderFromFileAsync()
+        {
+            
+            // await Task.Delay(5000);
+            var result = await Task.Run(() => ReaderFromFile());
+            
+            
+            //await Task.Delay(5000);
             return result;
         }
-        static List<(int Rating, string Nik, int Points)> ReaderFromFile(Player pl)
+        static List<(int Rating, string Nik, int Points)> ReaderFromFile()
         {
             var ListPlayers = new List<(int Rating, string Nik, int Points)>();
+
             using (var sr = new StreamReader(@"C:\Users\myasn\Downloads\tetris.txt"))
             {
                 string s;
@@ -60,50 +70,21 @@ namespace tetris2048
             }
             using (var sw = new StreamWriter(@"C:\Users\myasn\Downloads\tetris.txt", false))//check async
             {
-                sw.WriteLine(pl.Nik);
+                sw.WriteLine(ListPlayers[0].Nik);
 
             }
             return ListPlayers;
         }
         static void FileOfPoints(Player pl, List<(int Rating, string Nik, int Points)> ListPlayers)
         {
-            #region ReaderFile
-            ////string path = "tetris.txt";// int count = 0;
-            //var ListPlayers = new List<(int Rating, string Nik, int Points)>();  //ValueTuple
-            ////List<Player> ListPlayers = new List<Player>();
-            //using (var sr = new StreamReader(@"C:\Users\myasn\Downloads\tetris.txt"))
-            //{
-            //    string s;
-            //    while ((s = sr.ReadLine()) != null)
-            //    {
-            //        var line = s.Split('.', '-');
-            //        int.TryParse(line[0], out int R);
-            //        int.TryParse(line[2], out int P);
-            //        //ListPlayers.Add(new Player { Rating = R, Nik = line[1], Points = P });
-            //        ListPlayers.Add((R, line[1], P));
-            //    }
-            //}
-            #endregion
+            
             //ListPlayers.Add(new Player { Rating = pl.Rating, Nik = pl.Nik, Points = pl.Points});
-            ListPlayers.Add((pl.Rating, pl.Nik, pl.Points));
+            ListPlayers.Add((pl.Rating, pl.Nik, pl.Points));//add my new player
 
             var ListSortPlayers = (from p in ListPlayers
                                    orderby p.Points descending
                                    select p).ToList();
-            #region VT
-            // ListSortPlayers.ForEach(delegate ((int R, string N, int P)players)
-            //{
-            //    int position = 1;
-            //    players.R = position;
-            //    position++;
-            //});
-            //var count = ListSortPlayers.Aggregate(0, (index, item) =>
-            //{
-            //    item.Rating = index+1;
-
-            //    return (item.Rating) ;
-            //});
-            #endregion
+          
             int position = 1;
             for (var i = 0; i < ListSortPlayers.Count; i++)//change Rating
             {
@@ -121,12 +102,12 @@ namespace tetris2048
                     sw.WriteLine($"{item.Rating}. {item.Nik} - {item.Points}");
 
                 }
-                //sw.WriteLine(ListSortPlayers.Find(x=>x.Nik==pl.Nik).Rating);
+              
 
             }
             pl.Rating = ListSortPlayers.Find(x => x.Nik == pl.Nik).Rating;
             SizingUp(pl);
-            //return ListSortPlayers.Find(x => x.Nik == pl.Nik).Rating;
+            
         }
 
         static void SizingUp(Player newplayer)
@@ -215,17 +196,16 @@ namespace tetris2048
                     if (number == 0)
                     {
                         Console.Write(".");
-                        //Console.ForegroundColor = (ConsoleColor)15;
+                        
                     }
                     else
                     {
-                        //Console.ForegroundColor = (ConsoleColor)rnd.Next(1, 14);
+                     
                         Console.Write(number.ToString());
 
-                        // Console.ForegroundColor = (ConsoleColor)(15);
+                       
                     }
-                    //Console.Write(number == 0 ? "." : number.ToString() + "  ");
-
+                    
 
                 }
                 if (y == 1)
@@ -236,9 +216,7 @@ namespace tetris2048
             {
                 Console.WriteLine("GameOver");
                 player.Points = model.points;
-                //var result = FileOfPoints(player, ListPlayers);
-                // player.Rating = result;
-                //SizingUp(player);
+               
             }
 
             else

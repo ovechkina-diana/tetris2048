@@ -34,8 +34,8 @@ namespace tetris2048
         //public (string Nik, string ) CheckOf
         public override Player LogIn()
         {
-            Console.WriteLine("Придумайте ник"); var nik = Console.ReadLine();
-            Console.WriteLine("Придумайте пароль"); var password = Console.ReadLine();
+            Console.WriteLine("Введите ник"); var nik = Console.ReadLine();
+            Console.WriteLine("Введите пароль"); var password = Console.ReadLine();
 
             var player = new Player(nik, password)
             {

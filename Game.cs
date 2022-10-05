@@ -13,6 +13,10 @@ namespace tetris2048
 
         public static int MaxDegree { get; set; } = 1; // максимальная степень
 
+        public static int Points { get; set; }
+
+        private static int MinDegree;
+
         public static void Start() // начало игры
         {
             for (int x = 0; x < Map.width; x++)
@@ -41,7 +45,10 @@ namespace tetris2048
             Map.Show();
             Console.WriteLine();
             if (Game.Over)
+            {
                 Console.WriteLine("Game Over");
+                player.Points = Points;
+            }
             else
                 Console.WriteLine("Still play");
         }

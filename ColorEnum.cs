@@ -14,7 +14,7 @@ namespace tetris2048
         Magenta = 16,
         Green = 32,
         Cyan = 64,
-        Black = 128,
+        White = 128,
         DarkBlue = 256,
         DarkRed = 512,
         DarkYellow = 1024,

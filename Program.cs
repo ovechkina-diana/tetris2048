@@ -26,6 +26,8 @@ namespace tetris2048
             if (answer == 1)
             {
                 player = player.LogIn();
+                if (!player.CheckInData(result.Result, player)) //Console.WriteLine("Nik not found");
+                    throw new Exception();
 
             }
             else if (answer == 2) player = user.LogIn();

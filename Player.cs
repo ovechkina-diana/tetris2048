@@ -49,6 +49,15 @@ namespace tetris2048
             // pl = player;
             return player;
         }
+        public bool CheckInData(List<(int Rating, string Nik, int Points)> ListPlayers, Player player)
+        {
+            // ListPlayers.Exists(x => x.Nik == player.Nik);
+
+            var resultPl = ListPlayers.Contains((player.Rating, player.Nik, player.Points));
+            if (resultPl) return true;
+            //else Console.WriteLine("Nik not found");
+            return false;
+        }
     }
 }
 

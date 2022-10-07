@@ -8,45 +8,36 @@ namespace tetris2048
 {
     class User
     {
+        public string FullName { get; set; }
+        public string Nik { get; set; }//
+        public string Phone { get; set; }//TODO email+
+        public string Password { get; set; }
         public User() { }
-
-        public User(string nik, string password)
+        public virtual void LogIn()
         {
+            string patternForFullName = @"[A-ZА-Я][a-zа-я]+\s[A-ZА-Я][a-zа-я]+\s[A-ZА-Я][a-zа-я]+";
+            string patternForPhone = @"[8|+7]\d{10}";
+            Regex rgFullName = new Regex(patternForFullName);
+            Regex rgPhone = new Regex(patternForPhone);
+
+            var rndNikAndPass = Guid.NewGuid().ToString().Split('-');
+
+            Console.WriteLine("Введите ФИО"); var fullName = Console.ReadLine();
+            Match match = rgFullName.Match(fullName); if (!match.Success) throw new Exception("Неверный ввод ФИО");
+
+            Console.WriteLine("Введите номер телефона"); var number = Convert.ToInt64(Console.ReadLine());
+            match = rgPhone.Match(number.ToString()); if (!match.Success) throw new Exception();
+
+            var phone = string.Format("{0:# (###) ###-##-##}", number);
+
+
+            Console.WriteLine("Ваш уникальный ник "); var nik = rndNikAndPass[0].ToString().ToUpper(); Console.WriteLine(nik);
+            Console.WriteLine("Ваш уникальный пароль"); var password = rndNikAndPass[1].ToString(); Console.WriteLine(password);
+
+            FullName = fullName;
+            Phone = phone;
             Nik = nik;
             Password = password;
-        }
-
-        public User(string fn, string ph, string nik, string password)
-        {
-            FullName = fn;
-            Phone = ph;
-            Nik = nik;
-            Password = password;
-        }
-        public string FullName { get; init; }
-        public string Nik { get; init; }//
-        public string Phone { get; init; }//TODO email+
-        public string Password { get; init; }
-
-
-        public virtual Player LogIn()//(string FullN, string Ph, string Nik, string Pass)
-        {
-            Console.WriteLine("Введите ФИО"); var fullname = Console.ReadLine();
-            Console.WriteLine("Введите номер телефона"); var phone = Console.ReadLine();
-            Console.WriteLine("Придумайте ник"); var nik = Console.ReadLine();
-            Console.WriteLine("Придумайте пароль"); var password = Console.ReadLine();
-
-            var newuser = new Player(fullname, phone, nik, password)
-            {
-                FullName = fullname,
-                Phone = phone,
-                Nik = nik,
-                Password = password,
-                Points = 0,
-                Rating = 0
-            };
-            //var  pl = (Player)newuser;
-            return newuser;
         }
     }
 }

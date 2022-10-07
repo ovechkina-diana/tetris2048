@@ -26,7 +26,7 @@ namespace tetris2048
 
         public static Current AddCurrent() // выпадение нового кубика
         {
-            Current current = new Current(MaxDegree);
+            Current current = new Current(out MinDegree, MaxDegree);
             Map.Set(current.x, current.y, current.value);
             return current;
         }
@@ -44,13 +44,8 @@ namespace tetris2048
         {
             Map.Show();
             Console.WriteLine();
-            if (Game.Over)
-            {
-                Console.WriteLine("Game Over");
+            if (Over)
                 player.Points = Points;
-            }
-            else
-                Console.WriteLine("Still play");
         }
     }
 }

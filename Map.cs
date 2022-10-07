@@ -50,7 +50,7 @@ namespace tetris2048
                         Color.Out(color, number);
                     }
                     else
-                        Console.Write(" . ");
+                        Console.Write(" .  ");
                 }
                 if (y == 1)
                     Console.Write("-------");

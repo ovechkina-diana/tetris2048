@@ -8,57 +8,88 @@ namespace tetris2048
 {
     static class Join
     {
-        public static bool MergeCubes()
+        public static bool MergerIs() // проверяет, есть ли слияние
         {
-            bool JoinIs = false;
+            for (int y = Map.length - 1; y > 0; y--)
+                for (int x = Map.width - 1; x >= 0; x--)
 
-            for (int x = Map.width - 1; x >= 0; x--)
-                for (int y = Map.length - 1; y > 0; y--)
                     if (Map.Get(x, y) != 0)
                     {
-                        Merge(x, y, ref JoinIs);
-
-                        if (JoinIs)
-                            return JoinIs;
+                        if (Equality(x, y, +1, 0) || Equality(x, y, -1, 0) || Equality(x, y, 0, +1) || Equality(x, y, 0, -1))
+                            return true;
                     }
 
-            return JoinIs;
+            return false;
         }
 
-        public static void Merge(int x, int y, ref bool JoinIs) // объединение кубиков
+        private static bool Equality(int x, int y, int sx, int sy)
         {
-            int value = Map.Get(x, y);
-
-            MergewithLift(x, y, -1, 0, value, ref JoinIs);
-            //MergewithLift(x, y, +1, 0, value, ref JoinIs);
-            //MergewithLift(x, y, 0, +1, value, ref JoinIs);
-            MergewithLift(x, y, 0, -1, value, ref JoinIs);
-
-            if (JoinIs)
-                Game.Points += Map.Get(x, y);
+            return Map.Get(x + sx, y + sy) == Map.Get(x, y);
         }
 
-        private static void MergewithLift(int x, int y, int sx, int sy, int value, ref bool JoinIs)
+
+        private static bool Equality(int x, int y, int sx, int sy, int value)
         {
-            if (Map.Get(x + sx, y + sy) == value)
-            {
-                JoinIs = true;
+            return Map.Get(x + sx, y + sy) == value;
+        }
 
-                int NewValue = Map.Get(x, y) * 2;
+        public static void Mergering()
+        {
+            for (int y = 1; y < Map.length; y++)
+                for (int x = 0; x < Map.width; x++)
+                {
+                    int value = Map.Get(x, y);
+                    if (value == 0)
+                        continue;
 
-                if (NewValue > (int)Math.Pow(2, Game.MaxDegree))
-                    Game.MaxDegree++;
+                    if (Equality(x, y, -1, 0, value))
+                    {
+                        if (!Equality(x - 1, y, 0, -1, value) && !Equality(x - 1, y, 0, +1, value) && !Equality(x - 1, y, -1, 0, value))
+                            NewValue(x, y, -1, 0);
+                    }
 
-                Map.Set(x, y, NewValue);
+                    if (Equality(x, y, +1, 0, value))
+                    {
+                        if (!Equality(x + 1, y, 0, -1, value) && !Equality(x + 1, y, 0, +1, value) && !Equality(x + 1, y, +1, 0, value))
+                            NewValue(x, y, +1, 0);
+                    }
 
-                Map.Set(x + sx, y + sy, 0);
-            }
+                    if (Equality(x, y, 0, -1, value))
+                    {
+                        if (!Equality(x, y - 1, -1, 0, value) && !Equality(x, y - 1, +1, 0, value) && !Equality(x, y - 1, 0, -1, value))
+                            NewValue(x, y, 0, -1);
+                    }
+
+                    if (Equality(x, y, 0, +1, value))
+                    {
+                        if (!Equality(x, y + 1, -1, 0, value) && !Equality(x, y + 1, +1, 0, value) && !Equality(x, y + 1, 0, +1, value))
+                            NewValue(x, y, 0, +1);
+                    }
+
+                    if (Map.Get(x, y) != value)
+                    {
+                        Game.Points += Map.Get(x, y);
+                        return;
+                    }
+                }
+        }
+
+        private static void NewValue(int x, int y, int sx, int sy)
+        {
+            int NewValue = Map.Get(x, y) * 2;
+
+            if (NewValue > (int)Math.Pow(2, Game.MaxDegree))
+                Game.MaxDegree++;
+
+            Map.Set(x, y, NewValue);
+
+            Map.Set(x + sx, y + sy, 0);
         }
 
         public static void Down()
         {
-            for (int x = Map.width - 1; x >= 0; x--)
-                for (int y = Map.length - 1; y >= 0; y--)
+            for (int y = Map.length - 1; y >= 0; y--)
+                for (int x = Map.width - 1; x >= 0; x--)
                     if (Map.Get(x, y + 1) == 0)
                     {
                         Map.Set(x, y + 1, Map.Get(x, y));

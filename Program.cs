@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-
-namespace Game2048
+namespace tetris2048
 {
     class Program
     {

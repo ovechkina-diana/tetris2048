@@ -40,7 +40,7 @@ namespace tetris2048
             }
         }
 
-        public static void Show() // вывод поля
+        public static void Show(Player player) // вывод поля
         {
             Map.Show();
             Console.WriteLine();

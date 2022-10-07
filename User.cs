@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace tetris2048
 {
@@ -18,12 +19,24 @@ namespace tetris2048
         }
         public virtual void LogIn()
         {
-            var rndNik = Guid.NewGuid().ToString().Split('-');
-            // Regex regex = new Regex(@"^[A-ЯЁ][а-яё]+\s[A-ЯЁ][а-яё]+$");
-            Console.WriteLine("Введите ФИО"); var fullName = Console.ReadLine();// string name = string.Format((IFormatProvider)regex,fullName);
-            Console.WriteLine("Введите номер телефона"); var number = Convert.ToInt64(Console.ReadLine()); string phone = string.Format("{0:# (###) ###-##-##}", number);
-            Console.WriteLine("Ваш уникальный ник "); var nik = rndNik[0].ToString().ToUpper(); Console.WriteLine(nik);
-            Console.WriteLine("Ваш уникальный пароль"); var password = rndNik[1].ToString(); Console.WriteLine(password);
+            string patternForFullName = @"[A-ZА-Я][a-zа-я]+\s[A-ZА-Я][a-zа-я]+\s[A-ZА-Я][a-zа-я]+";
+            string patternForPhone = @"[8|+7]\d{10}";
+            Regex rgFullName = new Regex(patternForFullName);
+            Regex rgPhone = new Regex(patternForPhone);
+
+            var rndNikAndPass = Guid.NewGuid().ToString().Split('-');
+
+            Console.WriteLine("Введите ФИО"); var fullName = Console.ReadLine();
+            Match match = rgFullName.Match(fullName); if (!match.Success) throw new Exception("Неверный ввод ФИО");
+
+            Console.WriteLine("Введите номер телефона"); var number = Convert.ToInt64(Console.ReadLine());          
+            match = rgPhone.Match(number.ToString()); if (!match.Success) throw new Exception();
+
+            var phone = string.Format("{0:# (###) ###-##-##}", number);
+
+
+            Console.WriteLine("Ваш уникальный ник "); var nik = rndNikAndPass[0].ToString().ToUpper(); Console.WriteLine(nik);
+            Console.WriteLine("Ваш уникальный пароль"); var password = rndNikAndPass[1].ToString(); Console.WriteLine(password);
 
             FullName = fullName;
             Phone = phone;

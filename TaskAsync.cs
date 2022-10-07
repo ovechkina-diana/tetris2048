@@ -47,36 +47,18 @@ namespace tetris2048
 
         public static (List<Player>, List<User>) ResultAllTask()
         {
-            //Task<List<Player>> t1 = new Task<List<Player>>(() => ReaderFromFile());
-            //Task<List<User>> t2 = new Task<List<User>>(() => ReaderAllUsersInDataBase());
-            //tasks.Add(t1); tasks.Add(t2);
-            //t1.Start();
-            //t2.Start();
-            //Task.WaitAll(tasks.ToArray());
-            //t1.Wait();
             var result1 = ReaderFromFileAsync();
             var result2 = ReaderAllUsersInDataBaseAsync();
-            // var resTask1 = await task1;
-            // var result1 = t1.Result;
-            //var result2 = t2.Result;
-
             return (result1.Result, result2.Result);
         }
         static async Task<List<Player>> ReaderFromFileAsync()
-        {
-            // await Task.Delay(5000);
+        {          
             var result = await Task.Run(() => ReaderFromFile());
-            //result.Wait();
-
-            //await Task.Delay(5000);
             return result;
         }
         static async Task<List<User>> ReaderAllUsersInDataBaseAsync()
         {
-            // await Task.Delay(5000);
             var result = await Task.Run(() => ReaderAllUsersInDataBase());
-            //Console.WriteLine("t2");
-            //await Task.Delay(5000);
             return result;
         }
         public static List<User> ReaderAllUsersInDataBase()

@@ -6,107 +6,90 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-/*Проблемы*/
-/*1) Не очищается буфер! TmpKey использует неактуальные данные */
-/*2) Перед посадкой идет пауза*/
-/**/
 namespace tetris2048
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Program program = new Program();
-            program.Start();
+            var Results = TaskAsync.ResultAllTask();  //ValueTuple
+            var player = TaskAsync.HelloUser(Results.Item2);
+            Start(player);
+
+            TaskAsync.FileOfPoints(player, Results.Item1);
         }
 
-        void Start()
+        static void Start(Player player)
         {
-            Model model = new Model(5, 8);
-            model.Start();
-            Current current = new Current();
-            bool IsStillPlay = true;
-            ConsoleKey Key;
-            ConsoleKey TmpKey;
-            int sp = 0;
-            while (IsStillPlay)
+            Game.Start();                                              // начинаем игру
+
+            while (!Game.Over)                                         // пока не проиграли
             {
-                Console.Clear();
-                Show(model);
-                Thread.Sleep(1000);
-                Key = ConsoleKey.DownArrow;
-                TmpKey = ConsoleKey.Q; // в буфере q, а не команда
-                if (Console.KeyAvailable)
+                Current current = Game.AddCurrent();                   // добавляем новый кубик
+
+                while (!current.IsFell)                                // пока кубик не упал
                 {
-                    TmpKey = Console.ReadKey(true).Key;
-                }
-                if (TmpKey == ConsoleKey.LeftArrow || TmpKey == ConsoleKey.RightArrow || TmpKey == ConsoleKey.DownArrow)
-                {
-                    Key = TmpKey;
-                    sp = 1;
-                    if (TmpKey == ConsoleKey.DownArrow)
-                        sp = 2;
-                }
-                if (TmpKey == ConsoleKey.Backspace)
-                    IsStillPlay = false;
-                Move(Key, model, current, ref sp);  
-                if (current.Y == 7 || model.map.Get(current.X, current.Y + 1) != 0 )
-                {
-                    model.map.Set(current.X, current.Y, model.num);
-                    model.NewStart(current);
-                }
-                sp = 0;
-            }
-        }
-        static public void Move(ConsoleKey Key, Model model, Current current, ref int sp)
-        {
-            switch (Key)
-            {
-                case ConsoleKey.LeftArrow:
-                    model.Left(current);
-                    sp = 0;
-                    break;
-                case ConsoleKey.RightArrow:
-                    model.Right(current);
-                    sp = 0;
-                    break;
-                case ConsoleKey.DownArrow:
-                    if (sp == 0)
+                    Game.Show(player);
+                    Thread.Sleep(700);
+
+                    if (Console.KeyAvailable)
                     {
-                        model.Down(current);
-                    }
-                    else
-                        for (int i = 0; i < 8 - current.Y + 1; i++) // not enought
+                        ConsoleKey Key = Console.ReadKey(true).Key;
+
+                        switch (Key)
                         {
-                            model.Down(current);
-                            Thread.Sleep(500);
-                            Console.Clear();
-                            Show(model);
+                            case ConsoleKey.LeftArrow:
+                                Move.Left(ref current);
+                                break;
+
+                            case ConsoleKey.RightArrow:
+                                Move.Right(ref current);
+                                break;
+
+                            case ConsoleKey.DownArrow:
+                                while (!current.IsFell)
+                                {
+                                    Move.Down(ref current);
+
+                                    Game.Show(player);
+                                    Thread.Sleep(100);
+                                }
+                                break;
+
+                            case ConsoleKey.Enter:     // пауза
+                                Console.ReadLine();
+                                break;
+
+                            case ConsoleKey.Backspace:
+
+                                Game.Over = true;
+                                Game.Show(player);
+                                return;
                         }
-                    break;
-            }
-        }
+                    }
 
-        static void Show(Model model)
-        {
-            for (int y = 0; y < model.length; y++)
-            {
-                for (int x = 0; x < model.width; x++)
-                {
-                    Console.SetCursorPosition(x * 5 + 5, y * 2 + 2);
-
-                    int number = model.GetMap(x, y);
-
-                    Console.Write(number == 0 ? " . " : number.ToString() + "  ");
+                    Move.Down(ref current);
                 }
-                if (y == 1)
-                    Console.Write("-------");
+
+                while (true)
+                {
+                    if (!Join.MergerIs()) break;       // проверяем, есть ли объединение
+
+                    Join.Mergering();                  // объединяем
+
+                    Game.Show(player);                 // показываем как объединили
+                    Thread.Sleep(300);
+
+                    Join.Down();                       // опускаем кубики
+
+                    Game.Show(player);                 // показываем как опустили все элементы
+                    Thread.Sleep(300);
+                }
+
+                Game.IsGameOver();
             }
-            Console.WriteLine();
-            if (model.GameOver())
-                Console.WriteLine("Game Over");
-            else
-                Console.WriteLine("Still play");
+
+            Game.Show(player);
         }
     }
 }
